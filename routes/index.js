@@ -1,5 +1,8 @@
 var express = require('express');
+var bodyParser=require('body-parser');
 var router = express.Router();
+
+express().use(bodyParser.urlencoded({extended:true}));
 
 var Sequelize=require('sequelize');
 var sequelize=new Sequelize('learnproj', 'learnproj', 'learning project confusion', {
@@ -21,6 +24,21 @@ var Access=sequelize.define('access',{
 });
 Access.sync();
 
+var BoardPost=sequelize.define('boardPost',{
+    message:Sequelize.STRING(2048)});
+BoardPost.sync();
+
+function displayPosts(res){
+    BoardPost.findAll().then(function(boardPosts){
+	var html="<html><body><ul>";
+	for (i in boardPosts){
+	    html+="<li>Anonymous posted on "+boardPosts[i].createdAt+":<p>"+boardPosts[i].message+"</p></li>";
+	}
+	html+="</ul></body></html>";
+	res.send(html);});
+}
+	
+
 function logAccess(accessType,res){
     Access.create({type:accessType}).then(function(){
 var html="<html><body><ul>";
@@ -37,13 +55,16 @@ var html="<html><body><ul>";
 
 /*tutorial nonsense*/
 router.post('/',function(req,res){
-    logAccess('post',res);
+    //logAccess('post',res);
+    BoardPost.create({message:req.body.message}).then(function(){
+	displayPosts(res);});
 });
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    logAccess('get',res);
-  //res.render('index', { title: 'Express' });
+    //logAccess('get',res);
+    //res.render('index', { title: 'Express' });
+    displayPosts(res);
 });
 
 module.exports = router;
