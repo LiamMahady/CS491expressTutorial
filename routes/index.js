@@ -34,7 +34,7 @@ function displayPosts(res){
 	for (i in boardPosts){
 	    html+="<li>Anonymous posted on "+boardPosts[i].createdAt+":<p>"+boardPosts[i].message+"</p></li>";
 	}
-	html+="</ul></body></html>";
+	html+="</ul><form method=\"post\">Make a post:<br><input type=\"text\" name=\"message\"><input type=\"submit\" value=\"Submit\"></form></body></html>";
 	res.send(html);});
 }
 	
