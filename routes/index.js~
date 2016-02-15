@@ -1,0 +1,46 @@
+var express = require('express');
+var router = express.Router();
+
+var Sequelize=require('sequelize');
+var sequelize=new Sequelize('learnproj', 'learnproj', 'learning project confusion', {
+    host: 'localhost',
+     dialect: 'mysql',
+    pool:{
+	max:5,
+	min:0,
+	idle:10000
+    }
+ });
+
+var Access=sequelize.define('access',{
+    type: Sequelize.ENUM('get','post')
+});
+Access.sync();
+
+function logAccess(accessType){
+    Access.create({type:accessType});
+    var html="<html><body><ul>";
+    html+=Access.findAll().then(function(accesses){
+	var list;
+	for (access in accesses){
+	    list+="<li>Got a "+access.type;//+" request at "+access.createdAt+"</li>";
+	}
+	return list;
+    });
+			  html+="</ul></body></html>";
+    return html;
+}
+			  
+
+/*tutorial nonsense*/
+router.post('/',function(req,res){
+    res.send(logAccess('post'));
+});
+
+/* GET home page. */
+router.get('/', function(req, res, next) {
+    res.send(logAccess('get'));
+  //res.render('index', { title: 'Express' });
+});
+
+module.exports = router;
